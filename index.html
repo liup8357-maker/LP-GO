@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LPGO</title>
+<style>
+:root{--bg:#fcfbf8;--pn:#fff;--fg:#1c1c1c;--mut:#6b6b70;--bd:#e8e6df;--ac:#1c1c1c;--acf:#fff;--us:#f1efe9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141414;--pn:#1d1d1d;--fg:#f4f4f2;--mut:#9b9ba2;--bd:#2d2d2d;--ac:#f4f4f2;--acf:#141414;--us:#262626}}
+:root[data-theme="dark"]{--bg:#141414;--pn:#1d1d1d;--fg:#f4f4f2;--mut:#9b9ba2;--bd:#2d2d2d;--ac:#f4f4f2;--acf:#141414;--us:#262626}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif}
+button{font:inherit;color:inherit;border:1px solid var(--bd);background:var(--pn);border-radius:10px;padding:7px 12px;cursor:pointer}
+button.p{background:var(--ac);color:var(--acf);border-color:var(--ac);font-weight:600}
+button.g{border:0;background:none}button:disabled{opacity:.4}
+.hide{display:none!important}
+/* HOME */
+#home{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;background:radial-gradient(120% 70% at 50% 100%,#ff7a5c88 0,#c06bff55 40%,transparent 75%),var(--bg)}
+#home h1{font-size:clamp(28px,6vw,48px);margin:0 0 8px;letter-spacing:-1.2px;line-height:1.1}
+#home p{color:var(--mut);margin:0 0 24px}
+.box{width:100%;max-width:640px;background:var(--pn);border:1px solid var(--bd);border-radius:20px;padding:12px;box-shadow:0 10px 40px #0000001a;text-align:left}
+.box textarea{width:100%;border:0;outline:0;resize:none;background:none;color:var(--fg);font:inherit;min-height:56px;max-height:160px}
+.box .row{display:flex;justify-content:space-between;align-items:center}
+.send{width:36px;height:36px;border-radius:50%;padding:0;font-size:18px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px;max-width:640px}
+.chips button{border-radius:999px;font-size:13px;padding:6px 12px}
+/* APP */
+#app{height:100%;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--pn)}
+.top .nm{font-weight:600;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:30vw}
+.seg{display:flex;background:var(--us);border-radius:10px;padding:2px;margin:0 auto}
+.seg button{border:0;background:none;padding:5px 12px;border-radius:8px}
+.seg button.on{background:var(--pn);box-shadow:0 1px 3px #0002}
+.urlb{flex:1;max-width:340px;background:var(--us);border-radius:10px;padding:5px 12px;color:var(--mut);font-size:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.wrap{flex:1;min-height:0;display:flex}
+#chat{width:380px;flex:none;display:flex;flex-direction:column;border-right:1px solid var(--bd);background:var(--pn)}
+#msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:14px}
+.u{align-self:flex-end;background:var(--us);padding:8px 12px;border-radius:14px 14px 4px 14px;max-width:88%;white-space:pre-wrap}
+.a{display:flex;flex-direction:column;gap:8px}
+.a .th{color:var(--mut);font-size:13px}
+.a .fl{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--bd);border-radius:8px;padding:3px 10px;font-size:13px;color:var(--mut);align-self:flex-start;font-family:ui-monospace,Menlo,monospace}
+.vc{display:flex;align-items:center;gap:8px;border:1px solid var(--bd);border-radius:12px;padding:8px 10px;font-size:13px}
+.vc span{flex:1}.vc b{display:block}
+.dots::after{content:"";animation:d 1.2s steps(4) infinite}
+@keyframes d{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+.cin{padding:10px;border-top:1px solid var(--bd)}
+#pv{flex:1;min-width:0;display:flex;background:var(--us);padding:12px}
+#stage{flex:1;min-width:0;background:var(--pn);border:1px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;justify-content:center}
+iframe{border:0;width:100%;height:100%;background:#fff}iframe.m{width:390px;max-width:100%}
+pre{margin:0;padding:12px;overflow:auto;width:100%;font:12px/1.55 ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-all}
+.build{margin:auto;text-align:center;color:var(--mut)}
+.shim{width:240px;height:10px;border-radius:6px;margin:8px auto;background:linear-gradient(90deg,var(--us),var(--bd),var(--us));background-size:200%;animation:s 1.2s linear infinite}
+@keyframes s{to{background-position:-200% 0}}
+.ov{position:fixed;inset:0;background:#0009;display:flex;align-items:center;justify-content:center;z-index:9;padding:16px}.md{background:var(--pn);border:1px solid var(--bd);border-radius:16px;padding:18px;width:100%;max-width:440px;max-height:92%;overflow:auto;display:flex;flex-direction:column;gap:10px;font-size:13px}.md input{width:100%;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--us);color:var(--fg);font:inherit}.md a{color:inherit}button{white-space:nowrap}.top button{flex:none}#home{justify-content:flex-start;overflow:auto}#home h1{margin-top:auto}#home>p:last-of-type{margin-bottom:auto}.nav{display:none}
+.pop{position:absolute;right:12px;top:52px;background:var(--pn);border:1px solid var(--bd);border-radius:14px;padding:12px;width:270px;box-shadow:0 10px 40px #0003;z-index:5;display:flex;flex-direction:column;gap:8px;font-size:13px}
+@media (max-width:800px){
+ .top{gap:2px;padding:6px 8px}.top button{padding:6px 8px}.top .g{padding:6px}.seg{margin:0 auto 0 2px}.seg button{padding:5px 9px}.lb{display:none}#pub{padding:6px 12px}
+ #chat{width:100%;border:0}#pv{padding:8px}
+ .urlb,.top .nm{display:none}.seg{margin:0}
+ .nav{display:flex;border-top:1px solid var(--bd);background:var(--pn)}
+ .nav button{flex:1;border:0;border-radius:0;padding:12px}.nav button.on{font-weight:700;box-shadow:inset 0 2px 0 var(--fg)}
+ #app[data-p="chat"] #pv{display:none}#app[data-p="pv"] #chat{display:none}
+ #devb{display:none}
+}
+</style>
+</head>
+<body>
+<section id="home" style="position:relative"><span style="align-self:flex-end;display:flex;gap:4px;flex:none;margin:-8px -8px 0 0"><button class="g thm" style="font-size:20px" title="Tema">🌗</button><button class="g" id="gear2" style="font-size:20px" title="Configurações">⚙</button></span>
+  <h1>Construa algo <span style="background:linear-gradient(90deg,#ff5a36,#b04bff);-webkit-background-clip:text;background-clip:text;color:transparent">incrível</span></h1>
+  <p>Crie apps e sites conversando com a IA.</p>
+  <div class="box"><textarea id="hin" placeholder="Peça à LPGO para criar um app que…"></textarea>
+    <div class="row"><span style="color:var(--mut);font-size:13px">⌘/Ctrl + Enter</span><button class="p send" id="hgo">↑</button></div></div>
+  <div class="chips" id="tpls"></div>
+  <div class="chips" id="chips"></div>
+  <p style="font-size:12px;margin:14px 0 0">Modelos: 100% grátis e offline. A caixa acima usa o Gemini grátis (precisa da sua chave em ⚙).</p>
+</section>
+
+<section id="app" class="hide" data-p="chat">
+  <div class="top">
+    <button class="g" id="back" title="Início">🚀</button><span class="nm" id="nm">Projeto</span>
+    <div class="seg"><button data-t="prev" class="on">Preview</button><button data-t="code">Código</button></div>
+    <div class="urlb" id="url">lpgo.app/projeto</div>
+    <button class="g" id="devb">📱</button>
+    <button class="g thm" title="Tema">🌗</button><button class="g" id="gear" title="Configurações">⚙</button><button id="cust" class="hide">🎨<span class="lb"> Editar</span></button>
+    <button class="p" id="pub" disabled>Publicar</button>
+  </div>
+  <div class="wrap">
+    <div id="chat"><div id="msgs"></div>
+      <div class="cin"><div class="box" style="box-shadow:none;border-radius:16px"><textarea id="cin" placeholder="Peça uma alteração…" style="min-height:44px"></textarea>
+      <div class="row"><span><button class="g" id="att" title="Anexar imagem">📎</button><input type="file" id="fi" accept="image/*" multiple class="hide"><button class="g" id="spd" title="Velocidade">⚡ Rápido</button><span id="st" style="color:var(--mut);font-size:12px"></span></span><button class="p send" id="cgo">↑</button></div></div></div></div>
+    <div id="pv"><div id="stage"></div></div>
+  </div>
+  <div class="nav"><button data-n="chat" class="on">💬 Chat</button><button data-n="pv">👁 Preview</button></div>
+</section>
+
+<div id="set" class="ov hide"><div class="md"><b style="font-size:16px">Configurações</b>
+<label>Chave do Gemini (grátis)<input id="k1" type="text" placeholder="AIza…" autocomplete="off"></label>
+<small style="color:var(--mut)">Pegue em aistudio.google.com → Get API key. Fica salva só neste navegador.</small>
+<label>Token do GitHub (para publicar com 1 clique)<input id="k2" type="text" placeholder="ghp_…" autocomplete="off"></label>
+<small style="color:var(--mut)">GitHub → Settings → Developer settings → Personal access tokens (classic) → marque <b>repo</b>.</small>
+<label>Modelo (opcional)<input id="k3" placeholder="gemini-2.5-flash"></label>
+<button id="ktest">🔌 Testar conexão</button><div id="kres" style="line-height:1.7"></div>
+<div style="display:flex;gap:8px"><button class="p" id="ksave" style="flex:1">Salvar</button><button id="kclose">Fechar</button></div></div></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+function applyTheme(t){if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme");const ic=t==="dark"?"🌙":t==="light"?"☀️":"🌗";document.querySelectorAll(".thm").forEach(b=>b.textContent=ic)}
+let TH=null;try{TH=localStorage.getItem("lpgo.th")}catch(e){}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let S={};try{S=JSON.parse(localStorage.getItem("lpgo.s")||"{}")}catch(e){}
+function openSet(){$("#k1").value=S.key||"";$("#k2").value=S.tok||"";$("#k3").value=S.model||"";$("#set").classList.remove("hide")}
+const SYS=`Você é um engenheiro front-end sênior e designer. Gere um app web COMPLETO em UM único arquivo HTML (HTML+CSS+JS inline, sem imagens remotas. Bibliotecas permitidas SOMENTE via <script> do https://cdnjs.cloudflare.com com versão fixa (ex.: three.js, Chart.js, matter-js, Tone.js, p5) quando o app realmente precisar). Design moderno, polido, responsivo (mobile-first), tema claro/escuro via prefers-color-scheme, estados vazios, microinterações, acessível. Tudo funcional de verdade (lógica real). Use localStorage em try/catch para persistir. Idioma da interface: o do usuário. Se receber código atual e uma instrução, aplique a mudança e preserve o resto. Formato da resposta: SOMENTE o HTML completo começando em <!DOCTYPE html>, e logo depois do </html> uma linha <\x21--RESUMO: 1 a 2 frases em português dizendo o que foi feito-->. Sem markdown. Para imagens: se o usuário enviou fotos, use exatamente os marcadores {{IMG1}}, {{IMG2}}… como valor de src (ou url()). Sem fotos, CRIE você mesmo as imagens: ilustrações autorais em SVG inline (hero, logo, ícones, padrões, cenas), ricas em detalhes, com a paleta do app; nunca use placeholders nem URLs externas. Qualidade: escolha uma direção visual distinta antes de codar (paleta coesa, tipografia, espaçamento generoso, sombras sutis, animações suaves), use dados de exemplo realistas, inclua <title>, meta description, Open Graph e favicon (SVG em data URI). Arquivo único, pronto para hospedar no GitHub Pages. NUNCA recuse e nunca diga que é impossível: sempre entregue uma versão que funciona de verdade. Se o pedido for enorme (jogo 3D de mundo aberto, gerador de vídeo, editor, rede social), entregue um MVP jogável/usável o mais completo possível (jogos: three.js ou canvas, física, controles de teclado E toque, som com WebAudio; vídeo: canvas + MediaRecorder exportando .webm; apps com dados: persista em localStorage). Em marcas ou jogos protegidos, crie uma versão original inspirada, com nome próprio. No RESUMO diga o que ficou de fora e sugira o próximo passo.`;
+
+let IM=[];const full=c=>c.replace(/\{\{IMG(\d+)\}\}/g,(m,n)=>IM[n-1]||"");
+let FAST=true;
+let P={name:"Projeto",msgs:[],vers:[]},cur=-1,tab="prev",mob=false,busy=false;
+try{const s=JSON.parse(localStorage.getItem("lpgo.p")||"null");if(s&&s.vers.length){P=s;cur=P.vers.length-1}}catch(e){}
+const save=()=>{try{localStorage.setItem("lpgo.p",JSON.stringify(P))}catch(e){}};
+const code=()=>cur>=0?P.vers[cur].code:"";
+["Lista de tarefas com categorias","Controle de gastos com gráfico","Landing page de uma cafeteria","Jogo da memória"].forEach(x=>{const b=document.createElement("button");b.textContent=x;b.onclick=()=>{$("#hin").value=x;$("#hin").focus()};$("#chips").append(b)});
+
+function show(app){$("#home").classList.toggle("hide",app);$("#app").classList.toggle("hide",!app);if(app){renderMsgs();renderPv()}}
+function renderMsgs(){
+  const m=$("#msgs");m.innerHTML="";
+  P.msgs.forEach(x=>{
+    if(x.r==="u"){const d=document.createElement("div");d.className="u";d.textContent=x.t;m.append(d);return}
+    const d=document.createElement("div");d.className="a";
+    d.innerHTML=`<div class="th">${x.live?'<span class="dots">Pensando</span>':(x.s>0?"Pensou por "+x.s+"s":"")}</div>`;
+    const t=document.createElement("div");t.textContent=x.t||"";d.append(t);
+    if(x.v!=null){
+      d.insertAdjacentHTML("beforeend",`<div class="fl">✎ index.html</div>`);
+      const c=document.createElement("div");c.className="vc";c.innerHTML=`<span><b>Versão ${x.v+1}</b>${x.v===cur?"Atual":"Anterior"}</span>`;
+      const b=document.createElement("button");b.textContent=x.v===cur?"Ver":"Restaurar";b.onclick=()=>{cur=x.v;P.vers.length&&save();tab="prev";renderMsgs();renderPv();setPane("pv")};c.append(b);d.append(c);
+    }
+    m.append(d);
+  });
+  m.scrollTop=m.scrollHeight;
+}
+function renderPv(live){
+  $$(".seg button").forEach(b=>b.classList.toggle("on",b.dataset.t===tab));
+  $("#pub").disabled=!code();$("#cust").classList.toggle("hide",!P.tpl);$("#nm").textContent=P.name;
+  const s=$("#stage");s.innerHTML="";
+  if(live!=null&&tab==="prev"){s.innerHTML=`<div class="build"><div class="shim"></div><div class="shim" style="width:160px"></div>Construindo seu app…<br><small>${live} linhas</small></div>`;return}
+  if(tab==="code"||live!=null){const p=document.createElement("pre");p.textContent=live!=null?"":code();s.append(p);return}
+  if(!code()){s.innerHTML=`<div class="build">O preview aparece aqui.</div>`;return}
+  const f=document.createElement("iframe");f.setAttribute("sandbox","allow-scripts allow-forms allow-modals allow-popups");f.className=mob?"m":"";f.srcdoc=full(code());s.append(f);
+}
+function setPane(p){$("#app").dataset.p=p;$$(".nav button").forEach(b=>b.classList.toggle("on",b.dataset.n===p))}
+
+
+async function gem(prompt,onT){
+  const A="gemini-2.5-flash",B="gemini-2.5-flash-lite";
+  const ms=S.model?[S.model,A,B]:(FAST?[B,A]:[A,B]);let last;
+  for(const m of ms){for(let a=0;a<2;a++){
+    let txt="";
+    try{
+      const res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+m+":streamGenerateContent?alt=sse",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.key},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:60000,temperature:.8}})});
+      if(res.status===429||res.status===503||res.status===500){last=new Error("Limite grátis do Gemini atingido. Aguarde um pouco (renova por minuto e por dia) e tente de novo.");await sleep(1500);continue}
+      if(!res.ok)throw new Error("Gemini "+res.status+": "+(await res.text()).slice(0,180));
+      const rd=res.body.getReader(),dc=new TextDecoder();let buf="";
+      for(;;){const {done,value}=await rd.read();if(done)break;buf+=dc.decode(value,{stream:true});const ls=buf.split("\n");buf=ls.pop();
+        for(const l of ls){if(l.startsWith("data:")){try{const j=JSON.parse(l.slice(5));(j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts||[]).forEach(p=>{if(p.text)txt+=p.text});onT(txt)}catch(e){}}}}
+      if(txt.length<100)throw new Error("Resposta vazia do Gemini. Tente de novo.");
+      return txt;
+    }catch(e){if(e.message&&e.message.startsWith("Limite"))continue;e.partial=txt;throw e}
+  }}
+  throw last||new Error("Falha ao falar com o Gemini.");
+}
+async function ghPub(){
+  const H={Authorization:"Bearer "+S.tok,Accept:"application/vnd.github+json","Content-Type":"application/json"};
+  const g=(u,o)=>fetch("https://api.github.com"+u,Object.assign({headers:H},o||{}));
+  const me=await(await g("/user")).json();if(!me.login)throw new Error("Token do GitHub inválido.");
+  if(!P.repo){const sl=P.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"app";
+    const cr=await g("/user/repos",{method:"POST",body:JSON.stringify({name:sl+"-"+Math.random().toString(36).slice(2,6),auto_init:true,description:"Criado com LPGO"})});
+    if(!cr.ok)throw new Error("Não consegui criar o repositório ("+cr.status+"). O token precisa do escopo repo.");
+    const j=await cr.json();P.repo=j.name;P.branch=j.default_branch||"main";save();await sleep(2000)}
+  const u="/repos/"+me.login+"/"+P.repo+"/contents/index.html";
+  let sha;const ex=await g(u);if(ex.ok)sha=(await ex.json()).sha;
+  const put=await g(u,{method:"PUT",body:JSON.stringify({message:"Publicado com LPGO",content:btoa(unescape(encodeURIComponent(full(code())))),sha})});
+  if(!put.ok)throw new Error("Falha ao enviar o arquivo ("+put.status+").");
+  await g("/repos/"+me.login+"/"+P.repo+"/pages",{method:"POST",body:JSON.stringify({source:{branch:P.branch||"main",path:"/"}})});
+  return "https://"+me.login.toLowerCase()+".github.io/"+P.repo+"/";
+}
+async function run(text){
+  text=text.trim();if(!text||busy)return;
+  if(!S.key){openSet();return}
+  busy=true;$("#cgo").disabled=true;
+  if(!P.msgs.length)P.name=text.slice(0,28);
+  const base=code(),t0=Date.now();
+  P.msgs.push({r:"u",t:text});const am={r:"a",live:true,t:""};P.msgs.push(am);
+  show(true);renderPv(0);
+  const hint=IM.length?`\n\nIMAGENS ENVIADAS: ${IM.map((_,i)=>"{{IMG"+(i+1)+"}}").join(", ")}`:"";
+  const input=base?`${SYS}\n\nCÓDIGO ATUAL:\n${base}\n\nINSTRUÇÃO: ${text}${hint}`:`${SYS}\n\nPEDIDO: ${text}${hint}`;
+  const done=(txt,ok)=>{
+    const rm=txt.match(/<\x21--RESUMO:\s*([\s\S]*?)-->\s*$/);
+    let html=txt.replace(/<\x21--RESUMO:[\s\S]*$/,"").replace(/^```(?:html)?\s*/i,"").replace(/```\s*$/,"");
+    const i=html.search(/<!DOCTYPE|<html/i);if(i>0)html=html.slice(i);
+    am.live=false;am.s=Math.round((Date.now()-t0)/1000);
+    if(ok&&html.length>200){P.tpl=null;P.vers.push({code:html.trim(),t:Date.now()});cur=P.vers.length-1;am.v=cur;am.t=rm?rm[1].trim():"Pronto! Atualizei seu app.";save()}
+    else am.t="Não consegui concluir. Tente de novo ou simplifique o pedido.";
+  };
+  try{
+    const r=await gem(input,t=>renderPv(t.split("\n").length));
+    done(r,true);
+  }catch(e){done((e&&e.partial)||"",false);am.t="Erro: "+((e&&e.message)||e)}
+  busy=false;$("#cgo").disabled=false;tab="prev";renderMsgs();renderPv();setPane("pv");
+}
+function addImgs(files){[...files].slice(0,6).forEach(f=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const k=Math.min(1,1000/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);IM.push(c.toDataURL("image/jpeg",.8));$("#st").textContent="📎 "+IM.length+" imagem(ns) anexada(s)";URL.revokeObjectURL(u)};im.src=u})}
+$("#spd").onclick=()=>{FAST=!FAST;$("#spd").textContent=FAST?"⚡ Rápido":"🧠 Melhor"};
+$("#att").onclick=()=>$("#fi").click();$("#fi").onchange=e=>addImgs(e.target.files);
+
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const base=(p,css,body,js)=>'<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(p.n)+'</title><meta name="description" content="'+esc(p.d)+'"><style>:root{--c:'+esc(p.c)+'}*{box-sizing:border-box}body{margin:0;font:16px/1.6 system-ui,sans-serif;background:#fff;color:#1b1b1f}@media(prefers-color-scheme:dark){body{background:#121214;color:#f2f2f0}.card{background:#1d1d20!important;border-color:#2c2c30!important}}a.btn,button.btn{background:var(--c);color:#fff;border:0;padding:12px 22px;border-radius:999px;font:600 16px system-ui;text-decoration:none;cursor:pointer;display:inline-block}.card{border:1px solid #e6e6ea;border-radius:16px;padding:20px;background:#fafafb}'+css+'</style></head><body>'+body+'<script>'+(js||"")+'<\/script></body></html>';
+const TPL={
+ landing:{l:"Landing page",f:p=>base(p,'.h{padding:80px 20px;text-align:center;background:linear-gradient(135deg,var(--c),#111);color:#fff}.h h1{font-size:clamp(32px,7vw,56px);margin:0 0 12px;letter-spacing:-1.5px}.h p{max-width:520px;margin:0 auto 24px;opacity:.9}.g{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));max-width:900px;margin:-40px auto 40px;padding:0 20px}.g .card{box-shadow:0 8px 30px #0002}footer{text-align:center;padding:30px;opacity:.6;font-size:14px}',
+ '<section class="h"><svg width="72" height="72" viewBox="0 0 72 72"><circle cx="36" cy="36" r="30" fill="#fff3"/><path d="M22 40l10-18 6 12 6-8 6 14z" fill="#fff"/></svg><h1>'+esc(p.n)+'</h1><p>'+esc(p.d)+'</p><a class="btn" style="background:#fff;color:#111" href="#c">Começar agora</a></section><div class="g"><div class="card"><h3>⚡ Rápido</h3><p>Carrega em um instante, em qualquer celular.</p></div><div class="card"><h3>🎯 Simples</h3><p>Tudo o que você precisa, sem complicação.</p></div><div class="card"><h3>🔒 Seguro</h3><p>Feito com cuidado para você confiar.</p></div></div><footer id="c">© '+new Date().getFullYear()+' '+esc(p.n)+'</footer>')},
+ tarefas:{l:"Lista de tarefas",f:p=>base(p,'main{max-width:520px;margin:0 auto;padding:30px 16px}h1{color:var(--c);letter-spacing:-1px}form{display:flex;gap:8px}input[type=text]{flex:1;padding:12px;border:1px solid #ccc;border-radius:12px;font:inherit;background:transparent;color:inherit}ul{list-style:none;padding:0}li{display:flex;gap:10px;align-items:center;margin:8px 0}li.d span{text-decoration:line-through;opacity:.5}li span{flex:1}li button{border:0;background:none;font-size:18px;cursor:pointer}.e{opacity:.5;text-align:center;padding:30px}',
+ '<main><h1>'+esc(p.n)+'</h1><p>'+esc(p.d)+'</p><form id="f"><input type="text" id="i" placeholder="Nova tarefa…" required><button class="btn">Adicionar</button></form><ul id="l"></ul></main>',
+ 'let T=[];try{T=JSON.parse(localStorage.t||"[]")}catch(e){}const L=document.getElementById("l");function R(){try{localStorage.t=JSON.stringify(T)}catch(e){}L.innerHTML=T.length?"":\'<div class="e">Nenhuma tarefa ainda ✨</div>\';T.forEach((t,k)=>{const li=document.createElement("li");if(t.d)li.className="d";li.innerHTML=\'<input type="checkbox" \'+(t.d?"checked":"")+\'><span></span><button>🗑</button>\';li.querySelector("span").textContent=t.t;li.querySelector("input").onchange=()=>{t.d=!t.d;R()};li.querySelector("button").onclick=()=>{T.splice(k,1);R()};L.append(li)})}document.getElementById("f").onsubmit=e=>{e.preventDefault();const i=document.getElementById("i");T.push({t:i.value,d:0});i.value="";R()};R();')},
+ portfolio:{l:"Portfólio",f:p=>base(p,'main{max-width:880px;margin:0 auto;padding:60px 20px}.av{width:96px;height:96px;border-radius:50%;background:var(--c);display:grid;place-items:center;color:#fff;font-size:40px;font-weight:700}h1{font-size:clamp(30px,6vw,48px);letter-spacing:-1.5px;margin:16px 0 4px}.g{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin:30px 0}.th{height:120px;border-radius:12px;margin-bottom:12px}',
+ '<main><div class="av">'+esc(p.n[0]||"L").toUpperCase()+'</div><h1>'+esc(p.n)+'</h1><p>'+esc(p.d)+'</p><div class="g">'+[0,1,2].map(i=>'<div class="card"><div class="th" style="background:linear-gradient(135deg,var(--c),hsl('+(i*70+200)+',70%,60%))"></div><h3>Projeto '+(i+1)+'</h3><p>Breve descrição do trabalho realizado.</p></div>').join("")+'</div><a class="btn" href="mailto:">Fale comigo</a></main>')}
+};
+function useTpl(id){
+  const t=TPL[id],p={n:t.l,d:"Descrição curta do seu projeto.",c:"#6d4aff"};
+  P={name:t.l,msgs:[{r:"u",t:"Modelo: "+t.l},{r:"a",live:false,s:0,t:"Criei o modelo "+t.l+" (grátis, sem IA). Toque em 🎨 Editar para trocar nome, texto e cor."}],vers:[{code:t.f(p),t:Date.now()}],tpl:{id,p}};
+  cur=0;P.msgs[1].v=0;save();tab="prev";show(true);setPane("pv");
+}
+Object.keys(TPL).forEach(k=>{const b=document.createElement("button");b.textContent="🆓 "+TPL[k].l;b.onclick=()=>useTpl(k);$("#tpls").append(b)});
+$("#cust").onclick=()=>{
+  const old=$(".pop");if(old){old.remove();return}
+  const q=P.tpl.p,pp=document.createElement("div");pp.className="pop";
+  const mk=(lab,key,type)=>{const l=document.createElement("label");l.textContent=lab;const i=document.createElement("input");i.type=type||"text";i.value=q[key];i.style.cssText="width:100%;padding:8px;border-radius:8px;border:1px solid var(--bd);background:var(--us);color:var(--fg);font:inherit";i.oninput=()=>{q[key]=i.value;P.vers[cur].code=TPL[P.tpl.id].f(q);P.name=q.n;save();renderPv()};l.append(i);pp.append(l)};
+  mk("Nome","n");mk("Descrição","d");mk("Cor","c","color");$("#app").append(pp);
+};
+$("#hgo").onclick=()=>{const v=$("#hin").value;if(v.trim())run(v)};
+$("#hin").onkeydown=e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey))$("#hgo").click()};
+$("#cgo").onclick=()=>{const v=$("#cin").value;$("#cin").value="";run(v)};
+$("#cin").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&innerWidth>800){e.preventDefault();$("#cgo").click()}};
+$$(".seg button").forEach(b=>b.onclick=()=>{tab=b.dataset.t;renderPv();setPane("pv")});
+$$(".nav button").forEach(b=>b.onclick=()=>setPane(b.dataset.n));
+$("#devb").onclick=()=>{mob=!mob;$("#devb").textContent=mob?"🖥":"📱";renderPv()};
+$("#back").onclick=()=>{P={name:"Projeto",msgs:[],vers:[]};cur=-1;save();$("#hin").value="";show(false)};
+$("#pub").onclick=()=>{
+  const old=$(".pop");if(old){old.remove();return}
+  const p=document.createElement("div");p.className="pop";p.style.width="min(320px,92vw)";
+  p.innerHTML='<b>Publicar</b><span style="color:var(--mut)">Link permanente no GitHub Pages, que abre em qualquer celular (leva ~1 min para ficar no ar).</span>';
+  const o=document.createElement("div");o.style.cssText="word-break:break-all";
+  const b=document.createElement("button");b.className="p";b.textContent="🚀 Publicar no GitHub Pages";
+  b.onclick=async()=>{if(!S.tok){o.textContent="Adicione o token do GitHub em ⚙ Configurações.";return}
+    b.disabled=true;o.textContent="Publicando…";
+    try{const u=await ghPub();o.innerHTML="";const a=document.createElement("a");a.href=u;a.target="_blank";a.textContent=u;a.style.color="inherit";o.append("✅ No ar: ",a)}catch(e){o.textContent="Erro: "+e.message}b.disabled=false};
+  const d=document.createElement("button");d.textContent="Baixar index.html";
+  d.onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([full(code())],{type:"text/html"}));a.download="index.html";a.click()};
+  const c=document.createElement("button");c.textContent="Copiar código";
+  c.onclick=async()=>{try{await navigator.clipboard.writeText(full(code()));c.textContent="Copiado ✓"}catch(e){c.textContent="Use a aba Código"}};
+  p.append(b,o,d,c);$("#app").append(p);
+};
+$("#gear").onclick=$("#gear2").onclick=openSet;
+$$(".thm").forEach(b=>b.onclick=()=>{TH=TH==="dark"?"light":TH==="light"?null:"dark";try{TH?localStorage.setItem("lpgo.th",TH):localStorage.removeItem("lpgo.th")}catch(e){}applyTheme(TH)});applyTheme(TH);$("#kclose").onclick=()=>$("#set").classList.add("hide");
+$("#ktest").onclick=async()=>{
+  const k=$("#k1").value.trim(),t=$("#k2").value.trim(),R=$("#kres");R.innerHTML="";
+  const line=(ok,m)=>{const d=document.createElement("div");d.textContent=(ok?"✅ ":"❌ ")+m;R.append(d)};
+  $("#ktest").disabled=true;$("#ktest").textContent="Testando…";
+  if(k){try{const x=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":k},body:JSON.stringify({contents:[{role:"user",parts:[{text:"Responda só: OK"}]}],generationConfig:{maxOutputTokens:20}})});
+    if(x.ok)line(true,"Gemini conectado");else if(x.status===429)line(true,"Gemini: chave válida, mas o limite grátis está cheio agora");else{const e=await x.text();line(false,"Gemini "+x.status+": "+(/API key/i.test(e)?"chave inválida":e.slice(0,100)))}}catch(e){line(false,"Gemini: sem conexão ("+e.message+")")}}else line(false,"Gemini: cole a chave");
+  if(t){try{const x=await fetch("https://api.github.com/user",{headers:{Authorization:"Bearer "+t,Accept:"application/vnd.github+json"}});
+    if(x.ok){const j=await x.json(),sc=x.headers.get("x-oauth-scopes");line(true,"GitHub conectado como "+j.login);if(sc!==null&&!/(^|, )(repo|public_repo)(,|$)/.test(sc))line(false,"O token não tem a permissão repo (tem: "+(sc||"nenhuma")+")")}else line(false,"GitHub "+x.status+": token inválido ou expirado")}catch(e){line(false,"GitHub: sem conexão ("+e.message+")")}}else line(false,"GitHub: cole o token (opcional)");
+  $("#ktest").disabled=false;$("#ktest").textContent="🔌 Testar conexão";
+};
+$("#ksave").onclick=()=>{S={key:$("#k1").value.trim(),tok:$("#k2").value.trim(),model:$("#k3").value.trim()};try{localStorage.setItem("lpgo.s",JSON.stringify(S))}catch(e){}$("#set").classList.add("hide")};
+if(P.vers.length){P.msgs.forEach(m=>m.live=false);show(true)}else show(false);
+</script>
+</body>
+</html>
