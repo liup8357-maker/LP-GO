@@ -52,7 +52,7 @@ pre{margin:0;padding:12px;overflow:auto;width:100%;font:12px/1.55 ui-monospace,M
 .build{margin:auto;text-align:center;color:var(--mut)}
 .shim{width:240px;height:10px;border-radius:6px;margin:8px auto;background:linear-gradient(90deg,var(--us),var(--bd),var(--us));background-size:200%;animation:s 1.2s linear infinite}
 @keyframes s{to{background-position:-200% 0}}
-.ov{position:fixed;inset:0;background:#0009;display:flex;align-items:center;justify-content:center;z-index:9;padding:16px}.md{background:var(--pn);border:1px solid var(--bd);border-radius:16px;padding:18px;width:100%;max-width:440px;max-height:92%;overflow:auto;display:flex;flex-direction:column;gap:10px;font-size:13px}.md input{width:100%;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--us);color:var(--fg);font:inherit}.md a{color:inherit}button{white-space:nowrap}.top button{flex:none}#home{justify-content:flex-start;overflow:auto}#home h1{margin-top:auto}#home>p:last-of-type{margin-bottom:auto}.nav{display:none}
+.ov{position:fixed;inset:0;background:#0009;display:flex;align-items:center;justify-content:center;z-index:9;padding:16px}.md{background:var(--pn);border:1px solid var(--bd);border-radius:16px;padding:18px;width:100%;max-width:440px;max-height:92%;overflow:auto;display:flex;flex-direction:column;gap:10px;font-size:13px}.md input{width:100%;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--us);color:var(--fg);font:inherit}.md a{color:inherit}button{white-space:nowrap}.top button{flex:none}#home{justify-content:flex-start;overflow:auto}#home h1{margin-top:auto}#home>p:last-of-type{margin-bottom:auto}.tb{width:100%}.rs{line-height:1.5;word-break:break-word}.rs:empty{display:none}.nav{display:none}
 .pop{position:absolute;right:12px;top:52px;background:var(--pn);border:1px solid var(--bd);border-radius:14px;padding:12px;width:270px;box-shadow:0 10px 40px #0003;z-index:5;display:flex;flex-direction:column;gap:8px;font-size:13px}
 @media (max-width:800px){
  .top{gap:2px;padding:6px 8px}.top button{padding:6px 8px}.top .g{padding:6px}.seg{margin:0 auto 0 2px}.seg button{padding:5px 9px}.lb{display:none}#pub{padding:6px 12px}
@@ -96,11 +96,12 @@ pre{margin:0;padding:12px;overflow:auto;width:100%;font:12px/1.55 ui-monospace,M
 
 <div id="set" class="ov hide"><div class="md"><b style="font-size:16px">Configurações</b>
 <label>Chave do Gemini (grátis)<input id="k1" type="text" placeholder="AIza…" autocomplete="off"></label>
-<small style="color:var(--mut)">Pegue em aistudio.google.com → Get API key. Fica salva só neste navegador.</small>
+<button class="tb" id="t1">🔌 Testar chave do Gemini</button><div class="rs" id="r1"></div>
+<small style="color:var(--mut)">Pegue em aistudio.google.com → Get API key. Fica salva só neste aparelho.</small>
 <label>Token do GitHub (para publicar com 1 clique)<input id="k2" type="text" placeholder="ghp_…" autocomplete="off"></label>
+<button class="tb" id="t2">🔌 Testar token do GitHub</button><div class="rs" id="r2"></div>
 <small style="color:var(--mut)">GitHub → Settings → Developer settings → Personal access tokens (classic) → marque <b>repo</b>.</small>
-<label>Modelo (opcional)<input id="k3" placeholder="gemini-2.5-flash"></label>
-<button id="ktest">🔌 Testar conexão</button><div id="kres" style="line-height:1.7"></div>
+<label>Modelo (opcional, deixe vazio para automático)<input id="k3" placeholder="automático"></label>
 <div style="display:flex;gap:8px"><button class="p" id="ksave" style="flex:1">Salvar</button><button id="kclose">Fechar</button></div></div></div>
 <script>
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
@@ -148,14 +149,30 @@ function renderPv(live){
 function setPane(p){$("#app").dataset.p=p;$$(".nav button").forEach(b=>b.classList.toggle("on",b.dataset.n===p))}
 
 
+async function listModels(key){
+  const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200&key="+encodeURIComponent(key));
+  if(!r.ok){const e=new Error("HTTP "+r.status);e.status=r.status;e.body=await r.text();throw e}
+  const j=await r.json();
+  const ok=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")&&/flash/i.test(m.name)&&!/image|tts|live|audio|embed|robot|computer|exp|vision|thinking/i.test(m.name)).map(m=>m.name.replace("models/",""));
+  const ver=n=>parseFloat((n.match(/gemini-(\d+(?:\.\d+)?)/)||[0,0])[1]),lite=n=>/lite/i.test(n)?1:0,prev=n=>/preview|latest/i.test(n)?1:0;
+  return ok.sort((a,b)=>prev(a)-prev(b)||ver(b)-ver(a)||lite(a)-lite(b));
+}
+async function getModels(){
+  let l=S.models&&S.models.length?S.models:null;
+  if(!l){try{l=await listModels(S.key);S.models=l;try{localStorage.setItem("lpgo.s",JSON.stringify(S))}catch(e){}}catch(e){l=[]}}
+  let ms=l.slice();
+  if(FAST){const lt=ms.filter(n=>/lite/i.test(n));ms=lt.concat(ms.filter(n=>!lt.includes(n)))}
+  if(S.model)ms.unshift(S.model);
+  return ms.length?ms:["gemini-flash-latest","gemini-flash-lite-latest"];
+}
 async function gem(prompt,onT){
-  const A="gemini-2.5-flash",B="gemini-2.5-flash-lite";
-  const ms=S.model?[S.model,A,B]:(FAST?[B,A]:[A,B]);let last;
+  const ms=await getModels();let last;
   for(const m of ms){for(let a=0;a<2;a++){
     let txt="";
     try{
       const res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+m+":streamGenerateContent?alt=sse",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":S.key},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:60000,temperature:.8}})});
       if(res.status===429||res.status===503||res.status===500){last=new Error("Limite grátis do Gemini atingido. Aguarde um pouco (renova por minuto e por dia) e tente de novo.");await sleep(1500);continue}
+      if(res.status===404){last=new Error("Nenhum modelo do Gemini disponível para sua chave. Teste a chave em ⚙.");S.models=null;break}
       if(!res.ok)throw new Error("Gemini "+res.status+": "+(await res.text()).slice(0,180));
       const rd=res.body.getReader(),dc=new TextDecoder();let buf="";
       for(;;){const {done,value}=await rd.read();if(done)break;buf+=dc.decode(value,{stream:true});const ls=buf.split("\n");buf=ls.pop();
@@ -257,17 +274,36 @@ $("#pub").onclick=()=>{
 };
 $("#gear").onclick=$("#gear2").onclick=openSet;
 $$(".thm").forEach(b=>b.onclick=()=>{TH=TH==="dark"?"light":TH==="light"?null:"dark";try{TH?localStorage.setItem("lpgo.th",TH):localStorage.removeItem("lpgo.th")}catch(e){}applyTheme(TH)});applyTheme(TH);$("#kclose").onclick=()=>$("#set").classList.add("hide");
-$("#ktest").onclick=async()=>{
-  const k=$("#k1").value.trim(),t=$("#k2").value.trim(),R=$("#kres");R.innerHTML="";
-  const line=(ok,m)=>{const d=document.createElement("div");d.textContent=(ok?"✅ ":"❌ ")+m;R.append(d)};
-  $("#ktest").disabled=true;$("#ktest").textContent="Testando…";
-  if(k){try{const x=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":k},body:JSON.stringify({contents:[{role:"user",parts:[{text:"Responda só: OK"}]}],generationConfig:{maxOutputTokens:20}})});
-    if(x.ok)line(true,"Gemini conectado");else if(x.status===429)line(true,"Gemini: chave válida, mas o limite grátis está cheio agora");else{const e=await x.text();line(false,"Gemini "+x.status+": "+(/API key/i.test(e)?"chave inválida":e.slice(0,100)))}}catch(e){line(false,"Gemini: sem conexão ("+e.message+")")}}else line(false,"Gemini: cole a chave");
-  if(t){try{const x=await fetch("https://api.github.com/user",{headers:{Authorization:"Bearer "+t,Accept:"application/vnd.github+json"}});
-    if(x.ok){const j=await x.json(),sc=x.headers.get("x-oauth-scopes");line(true,"GitHub conectado como "+j.login);if(sc!==null&&!/(^|, )(repo|public_repo)(,|$)/.test(sc))line(false,"O token não tem a permissão repo (tem: "+(sc||"nenhuma")+")")}else line(false,"GitHub "+x.status+": token inválido ou expirado")}catch(e){line(false,"GitHub: sem conexão ("+e.message+")")}}else line(false,"GitHub: cole o token (opcional)");
-  $("#ktest").disabled=false;$("#ktest").textContent="🔌 Testar conexão";
+let TM=null;
+const rs=(el,ok,m)=>{el.textContent=(ok?"✅ ":"❌ ")+m};
+const gerr=t=>{try{return JSON.parse(t).error.message}catch(e){return String(t).slice(0,180)}};
+const netmsg=(who,e)=>"Sem conexão com "+who+" ("+e.message+"). Possíveis causas: sem internet, VPN, ou o visualizador/APK bloqueando acesso à rede.";
+$("#t1").onclick=async()=>{
+  const k=$("#k1").value.trim(),R=$("#r1"),b=$("#t1");if(!k){rs(R,0,"Cole a chave primeiro.");return}
+  b.disabled=true;b.textContent="Testando…";R.textContent="";
+  try{
+    let l=null,note="";
+    try{l=await listModels(k)}catch(e){if(e.status)throw e}
+    if(l===null){l=["gemini-flash-latest","gemini-flash-lite-latest"];note=" (não consegui listar os modelos, usando o nome automático)"}
+    else if(!l.length){rs(R,0,"A chave funciona, mas nenhum modelo Flash está disponível para ela.");b.disabled=false;b.textContent="🔌 Testar chave do Gemini";return}
+    TM=l;
+    const x=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+l[0]+":generateContent",{method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":k},body:JSON.stringify({contents:[{role:"user",parts:[{text:"Responda só: OK"}]}],generationConfig:{maxOutputTokens:20}})});
+    if(x.ok)rs(R,1,"Gemini conectado! Modelo: "+l[0]+note);
+    else if(x.status===429)rs(R,1,"Chave válida, mas o limite grátis está cheio agora. Modelo: "+l[0]);
+    else rs(R,0,"Google respondeu "+x.status+": "+gerr(await x.text()));
+  }catch(e){rs(R,0,e.status?"Google respondeu "+e.status+": "+gerr(e.body||""):netmsg("o Google",e))}
+  b.disabled=false;b.textContent="🔌 Testar chave do Gemini";
 };
-$("#ksave").onclick=()=>{S={key:$("#k1").value.trim(),tok:$("#k2").value.trim(),model:$("#k3").value.trim()};try{localStorage.setItem("lpgo.s",JSON.stringify(S))}catch(e){}$("#set").classList.add("hide")};
+$("#t2").onclick=async()=>{
+  const t=$("#k2").value.trim(),R=$("#r2"),b=$("#t2");if(!t){rs(R,0,"Cole o token primeiro.");return}
+  b.disabled=true;b.textContent="Testando…";R.textContent="";
+  try{const x=await fetch("https://api.github.com/user",{headers:{Authorization:"Bearer "+t,Accept:"application/vnd.github+json"}});
+    if(x.ok){const j=await x.json(),sc=x.headers.get("x-oauth-scopes");
+      if(sc!==null&&!/(^|, )(repo|public_repo)(,|$)/.test(sc))rs(R,0,"Conectado como "+j.login+", mas falta a permissão repo (tem: "+(sc||"nenhuma")+").");else rs(R,1,"GitHub conectado como "+j.login)}
+    else rs(R,0,"GitHub respondeu "+x.status+": "+gerr(await x.text()))}catch(e){rs(R,0,netmsg("o GitHub",e))}
+  b.disabled=false;b.textContent="🔌 Testar token do GitHub";
+};
+$("#ksave").onclick=()=>{{const nk=$("#k1").value.trim();S={key:nk,tok:$("#k2").value.trim(),model:$("#k3").value.trim(),models:TM||(nk===S.key?S.models:null)}};try{localStorage.setItem("lpgo.s",JSON.stringify(S))}catch(e){}$("#set").classList.add("hide")};
 if(P.vers.length){P.msgs.forEach(m=>m.live=false);show(true)}else show(false);
 </script>
 </body>
